@@ -2,6 +2,7 @@ import { InputHandler } from './Input.js';
 import { Player } from './Player.js';
 import { RoomMap } from './Map.js';
 import { Textbox } from './Textbox.js';
+import { BattleEngine } from './Battle.js';
 
 export class GameEngine {
   constructor(canvasId) {
@@ -12,10 +13,11 @@ export class GameEngine {
     this.player = new Player(152, 120);
     this.map = new RoomMap();
     this.textbox = new Textbox();
+    this.battle = new BattleEngine();
 
-    // Transition State Machine: 'none', 'out', 'in'
     this.fadeAlpha = 0;
     this.fadeState = 'none';
+    this.pendingBattle = false;
 
     this.lastTime = 0;
     this.accumulatedTime = 0;
@@ -43,14 +45,22 @@ export class GameEngine {
   }
 
   update(dt) {
-    // Manage Room Transitions
+    // Battle Mode Takes Priority
+    if (this.battle.active) {
+      this.battle.update(this.input);
+      return;
+    }
+
+    // Handle Transitions
     if (this.fadeState === 'out') {
       this.fadeAlpha += dt * 3.0;
       if (this.fadeAlpha >= 1) {
         this.fadeAlpha = 1;
-        
-        // Swap room at full opacity
-        if (this.map.currentRoom === 'bedroom') {
+
+        if (this.pendingBattle) {
+          this.pendingBattle = false;
+          this.battle.startBattle();
+        } else if (this.map.currentRoom === 'bedroom') {
           this.map.loadRoom('hallway');
           this.player.x = 142;
           this.player.y = 42;
@@ -75,7 +85,6 @@ export class GameEngine {
       }
     }
 
-    // Freeze Kris during Dialogue
     if (this.textbox.visible) {
       this.textbox.update(this.input);
       return;
@@ -83,16 +92,20 @@ export class GameEngine {
 
     this.player.update(this.input, this.map);
 
-    // Dialogue Triggers
+    // Dialogue / Interaction Triggers
     if (this.input.isPressed('confirm')) {
       const targetPoint = this.player.getInteractionTile();
       const object = this.map.getInteractableAt(targetPoint);
       if (object) {
         this.textbox.start(object.dialogue);
+        if (object.isMonster) {
+          this.pendingBattle = true;
+          this.fadeState = 'out';
+        }
       }
     }
 
-    // Doorway Trigger
+    // Doorway Triggers
     if (this.map.checkDoor(this.player.getBounds()) && this.fadeState === 'none') {
       this.fadeState = 'out';
     }
@@ -101,14 +114,15 @@ export class GameEngine {
   render() {
     this.ctx.clearRect(0, 0, this.canvas.width, this.canvas.height);
 
-    // World & Entities
-    this.map.render(this.ctx);
-    this.player.render(this.ctx);
+    if (this.battle.active) {
+      this.battle.render(this.ctx);
+    } else {
+      this.map.render(this.ctx);
+      this.player.render(this.ctx);
+      this.textbox.render(this.ctx);
+    }
 
-    // Dialogue UI
-    this.textbox.render(this.ctx);
-
-    // Screen Fade Overlay
+    // Fade Mask
     if (this.fadeAlpha > 0) {
       this.ctx.fillStyle = `rgba(0, 0, 0, ${this.fadeAlpha})`;
       this.ctx.fillRect(0, 0, 320, 240);
