@@ -1,13 +1,12 @@
-import { drawPixelMatrix, KRIS_PALETTE, KRIS_DOWN, KRIS_UP, KRIS_LEFT } from './Sprites.js';
+import { drawPixelMatrix, PALETTE, KRIS_DOWN, KRIS_UP, KRIS_LEFT, KRIS_RIGHT } from './Sprites.js';
 
 export class Player {
   constructor(x, y) {
     this.x = x;
     this.y = y;
     this.width = 17;
-    this.height = 25;
-    
-    this.boxOffset = { x: 2, y: 14, w: 13, h: 10 };
+    this.height = 18;
+    this.boxOffset = { x: 2, y: 10, w: 13, h: 8 };
 
     this.walkSpeed = 1.35;
     this.runSpeed = 2.3;
@@ -53,9 +52,9 @@ export class Player {
 
     if (this.isMoving) {
       if (dy < 0) this.facing = 'up';
-      if (dy > 0) this.facing = 'down';
-      if (dx < 0) this.facing = 'left';
-      if (dx > 0) this.facing = 'right';
+      else if (dy > 0) this.facing = 'down';
+      else if (dx < 0) this.facing = 'left';
+      else if (dx > 0) this.facing = 'right';
 
       const speed = input.isHeld('cancel') ? this.runSpeed : this.walkSpeed;
 
@@ -74,8 +73,8 @@ export class Player {
         this.y = nextY;
       }
 
-      this.animTimer += input.isHeld('cancel') ? 1.6 : 1;
-      if (this.animTimer >= 10) {
+      this.animTimer += input.isHeld('cancel') ? 1.8 : 1;
+      if (this.animTimer >= 8) {
         this.animTimer = 0;
         this.animFrame = (this.animFrame + 1) % 4;
       }
@@ -86,26 +85,20 @@ export class Player {
 
   render(ctx) {
     let spriteMatrix = KRIS_DOWN;
-    let flipX = false;
-
     if (this.facing === 'up') spriteMatrix = KRIS_UP;
     if (this.facing === 'left') spriteMatrix = KRIS_LEFT;
-    if (this.facing === 'right') {
-      spriteMatrix = KRIS_LEFT;
-      flipX = true;
-    }
+    if (this.facing === 'right') spriteMatrix = KRIS_RIGHT;
 
-    // Step Bobbing Effect
-    const bobY = (this.animFrame === 1 || this.animFrame === 3) ? -1 : 0;
+    // Walk Bobbing Offset
+    const bobY = (this.animFrame === 1) ? -1 : (this.animFrame === 3) ? 1 : 0;
 
-    ctx.save();
-    if (flipX) {
-      ctx.translate(Math.round(this.x) + 17, Math.round(this.y) + bobY);
-      ctx.scale(-1, 1);
-      drawPixelMatrix(ctx, spriteMatrix, KRIS_PALETTE, 0, 0, 1);
-    } else {
-      drawPixelMatrix(ctx, spriteMatrix, KRIS_PALETTE, Math.round(this.x), Math.round(this.y) + bobY, 1);
-    }
-    ctx.restore();
+    drawPixelMatrix(
+      ctx,
+      spriteMatrix,
+      PALETTE,
+      Math.round(this.x),
+      Math.round(this.y) + bobY,
+      1
+    );
   }
 }
