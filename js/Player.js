@@ -2,18 +2,16 @@ export class Player {
   constructor(x, y) {
     this.x = x;
     this.y = y;
-    this.width = 16;
-    this.height = 16;
+    this.width = 19;
+    this.height = 28;
     
-    // Collision bounding box offset (lower half of body)
-    this.boxOffset = { x: 2, y: 8, w: 12, h: 8 };
+    this.boxOffset = { x: 3, y: 16, w: 13, h: 12 };
 
-    this.walkSpeed = 1.25;
-    this.runSpeed = 2.25;
-    this.facing = 'down'; // 'up', 'down', 'left', 'right'
+    this.walkSpeed = 1.35;
+    this.runSpeed = 2.4;
+    this.facing = 'down';
     this.isMoving = false;
 
-    // Sprite Animation States
     this.animFrame = 0;
     this.animTimer = 0;
   }
@@ -31,7 +29,7 @@ export class Player {
     let checkX = this.x + this.boxOffset.x + this.boxOffset.w / 2;
     let checkY = this.y + this.boxOffset.y + this.boxOffset.h / 2;
 
-    const reach = 12;
+    const reach = 14;
     if (this.facing === 'up') checkY -= reach;
     if (this.facing === 'down') checkY += reach;
     if (this.facing === 'left') checkX -= reach;
@@ -52,35 +50,29 @@ export class Player {
     this.isMoving = dx !== 0 || dy !== 0;
 
     if (this.isMoving) {
-      // Set Facing Direction
       if (dy < 0) this.facing = 'up';
       if (dy > 0) this.facing = 'down';
       if (dx < 0) this.facing = 'left';
       if (dx > 0) this.facing = 'right';
 
-      // Speed Modifier
-      const currentSpeed = input.isHeld('cancel') ? this.runSpeed : this.walkSpeed;
+      const speed = input.isHeld('cancel') ? this.runSpeed : this.walkSpeed;
 
-      // Normalize diagonal speed
       if (dx !== 0 && dy !== 0) {
         dx *= 0.7071;
         dy *= 0.7071;
       }
 
-      // X-Axis Movement & Wall Sliding
-      const nextX = this.x + dx * currentSpeed;
+      const nextX = this.x + dx * speed;
       if (!map.checkCollision(this.getBounds(nextX, this.y))) {
         this.x = nextX;
       }
 
-      // Y-Axis Movement & Wall Sliding
-      const nextY = this.y + dy * currentSpeed;
-      if (!map.checkCollision(this.getBounds(this.x, nextY))) {
+      const nextY = this.y + dy * speed;
+      if (!map.checkCollision(this.x, nextY)) {
         this.y = nextY;
       }
 
-      // Animation Timer
-      this.animTimer += input.isHeld('cancel') ? 1.5 : 1;
+      this.animTimer += input.isHeld('cancel') ? 1.8 : 1;
       if (this.animTimer >= 10) {
         this.animTimer = 0;
         this.animFrame = (this.animFrame + 1) % 4;
@@ -91,21 +83,40 @@ export class Player {
   }
 
   render(ctx) {
-    // Procedural Fallback Sprite (Kris Color Palette)
-    ctx.fillStyle = '#00FFFF'; // Hair/Skin
-    ctx.fillRect(this.x + 3, this.y, 10, 6);
+    const px = Math.round(this.x);
+    const py = Math.round(this.y);
 
-    ctx.fillStyle = '#008000'; // Torso
-    ctx.fillRect(this.x + 2, this.y + 6, 12, 6);
+    // Bobbing step offset
+    const stepY = (this.animFrame === 1 || this.animFrame === 3) ? -1 : 0;
 
-    ctx.fillStyle = '#000080'; // Legs
-    ctx.fillRect(this.x + 3, this.y + 12, 10, 4);
+    // Hair
+    ctx.fillStyle = '#0f172a';
+    ctx.fillRect(px + 2, py + stepY, 15, 10);
 
-    // Direction Indicator/Facing visor
-    ctx.fillStyle = '#FF0000';
-    if (this.facing === 'down') ctx.fillRect(this.x + 5, this.y + 4, 6, 2);
-    if (this.facing === 'up') ctx.fillRect(this.x + 5, this.y + 1, 6, 2);
-    if (this.facing === 'left') ctx.fillRect(this.x + 2, this.y + 3, 2, 4);
-    if (this.facing === 'right') ctx.fillRect(this.x + 12, this.y + 3, 2, 4);
+    // Skin (Cyan Light World/Dark World Tone)
+    ctx.fillStyle = '#38bdf8';
+    ctx.fillRect(px + 4, py + 8 + stepY, 11, 6);
+
+    // Green Torso with Yellow Stripe
+    ctx.fillStyle = '#15803d';
+    ctx.fillRect(px + 3, py + 13 + stepY, 13, 9);
+    ctx.fillStyle = '#facc15';
+    ctx.fillRect(px + 3, py + 17 + stepY, 13, 2);
+
+    // Dark Pants & Shoes
+    ctx.fillStyle = '#1e1b4b';
+    ctx.fillRect(px + 4, py + 22, 11, 6);
+
+    // Face / Direction Detailing
+    if (this.facing === 'down') {
+      ctx.fillStyle = '#0f172a'; // Bangs over eyes
+      ctx.fillRect(px + 3, py + 6 + stepY, 13, 5);
+    } else if (this.facing === 'left') {
+      ctx.fillStyle = '#0f172a';
+      ctx.fillRect(px + 1, py + 4 + stepY, 6, 12);
+    } else if (this.facing === 'right') {
+      ctx.fillStyle = '#0f172a';
+      ctx.fillRect(px + 12, py + 4 + stepY, 6, 12);
+    }
   }
 }
