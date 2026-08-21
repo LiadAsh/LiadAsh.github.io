@@ -1,14 +1,16 @@
+import { drawPixelMatrix, KRIS_PALETTE, KRIS_DOWN, KRIS_UP, KRIS_LEFT } from './Sprites.js';
+
 export class Player {
   constructor(x, y) {
     this.x = x;
     this.y = y;
-    this.width = 19;
-    this.height = 28;
+    this.width = 17;
+    this.height = 25;
     
-    this.boxOffset = { x: 3, y: 16, w: 13, h: 12 };
+    this.boxOffset = { x: 2, y: 14, w: 13, h: 10 };
 
     this.walkSpeed = 1.35;
-    this.runSpeed = 2.4;
+    this.runSpeed = 2.3;
     this.facing = 'down';
     this.isMoving = false;
 
@@ -68,11 +70,11 @@ export class Player {
       }
 
       const nextY = this.y + dy * speed;
-      if (!map.checkCollision(this.x, nextY)) {
+      if (!map.checkCollision(this.getBounds(this.x, nextY))) {
         this.y = nextY;
       }
 
-      this.animTimer += input.isHeld('cancel') ? 1.8 : 1;
+      this.animTimer += input.isHeld('cancel') ? 1.6 : 1;
       if (this.animTimer >= 10) {
         this.animTimer = 0;
         this.animFrame = (this.animFrame + 1) % 4;
@@ -83,40 +85,27 @@ export class Player {
   }
 
   render(ctx) {
-    const px = Math.round(this.x);
-    const py = Math.round(this.y);
+    let spriteMatrix = KRIS_DOWN;
+    let flipX = false;
 
-    // Bobbing step offset
-    const stepY = (this.animFrame === 1 || this.animFrame === 3) ? -1 : 0;
-
-    // Hair
-    ctx.fillStyle = '#0f172a';
-    ctx.fillRect(px + 2, py + stepY, 15, 10);
-
-    // Skin (Cyan Light World/Dark World Tone)
-    ctx.fillStyle = '#38bdf8';
-    ctx.fillRect(px + 4, py + 8 + stepY, 11, 6);
-
-    // Green Torso with Yellow Stripe
-    ctx.fillStyle = '#15803d';
-    ctx.fillRect(px + 3, py + 13 + stepY, 13, 9);
-    ctx.fillStyle = '#facc15';
-    ctx.fillRect(px + 3, py + 17 + stepY, 13, 2);
-
-    // Dark Pants & Shoes
-    ctx.fillStyle = '#1e1b4b';
-    ctx.fillRect(px + 4, py + 22, 11, 6);
-
-    // Face / Direction Detailing
-    if (this.facing === 'down') {
-      ctx.fillStyle = '#0f172a'; // Bangs over eyes
-      ctx.fillRect(px + 3, py + 6 + stepY, 13, 5);
-    } else if (this.facing === 'left') {
-      ctx.fillStyle = '#0f172a';
-      ctx.fillRect(px + 1, py + 4 + stepY, 6, 12);
-    } else if (this.facing === 'right') {
-      ctx.fillStyle = '#0f172a';
-      ctx.fillRect(px + 12, py + 4 + stepY, 6, 12);
+    if (this.facing === 'up') spriteMatrix = KRIS_UP;
+    if (this.facing === 'left') spriteMatrix = KRIS_LEFT;
+    if (this.facing === 'right') {
+      spriteMatrix = KRIS_LEFT;
+      flipX = true;
     }
+
+    // Step Bobbing Effect
+    const bobY = (this.animFrame === 1 || this.animFrame === 3) ? -1 : 0;
+
+    ctx.save();
+    if (flipX) {
+      ctx.translate(Math.round(this.x) + 17, Math.round(this.y) + bobY);
+      ctx.scale(-1, 1);
+      drawPixelMatrix(ctx, spriteMatrix, KRIS_PALETTE, 0, 0, 1);
+    } else {
+      drawPixelMatrix(ctx, spriteMatrix, KRIS_PALETTE, Math.round(this.x), Math.round(this.y) + bobY, 1);
+    }
+    ctx.restore();
   }
 }
