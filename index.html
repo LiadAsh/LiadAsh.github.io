@@ -471,6 +471,53 @@ html,body{height:100%;width:100%;background:var(--bg);color:var(--ink);font-fami
     </div>
   </section>
 
+  <!-- ============ 2. PROBLEM ============ -->
+  <section class="slide" data-section="The problem" data-sub="Why teams struggle today">
+    <div class="slide-inner s-problem">
+      <div class="s-problem-grid">
+        <div class="s-problem-left">
+          <div class="eyebrow reveal"><span class="dt"></span>The problem</div>
+          <h2 class="h-display reveal">Modern stacks are <em>loud</em>. Teams are tired of decoding dashboards.</h2>
+          <p class="body-lg reveal" style="max-width:520px">Engineers spend an average of <strong style="color:#fff;font-weight:500">4.2 hours per week</strong> piecing together what their systems are actually trying to say. We think that's broken.</p>
+        </div>
+        <div class="s-problem-right">
+          <div class="problem-card glass-card reveal">
+            <div class="pc-num">01</div>
+            <div class="pc-body">
+              <h3>Too many panes of glass</h3>
+              <p>Logs, metrics, traces, alerts &mdash; each in its own tool, each with its own dialect.</p>
+            </div>
+            <div class="pc-icon">&#8230;</div>
+          </div>
+          <div class="problem-card glass-card reveal">
+            <div class="pc-num">02</div>
+            <div class="pc-body">
+              <h3>Alert fatigue is real</h3>
+              <p>87% of pages are noise. The signal you actually need arrives 11 minutes too late.</p>
+            </div>
+            <div class="pc-icon">&#9888;</div>
+          </div>
+          <div class="problem-card glass-card reveal">
+            <div class="pc-num">03</div>
+            <div class="pc-body">
+              <h3>Context is always missing</h3>
+              <p>By the time you've found the chart, you've forgotten the question.</p>
+            </div>
+            <div class="pc-icon">&#10067;</div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+</div>
+
+<!-- NAV: prev | next -->
+<div class="nav">
+  <button id="prev" aria-label="Previous slide">&larr;</button>
+  <button id="next" aria-label="Next slide">&rarr;</button>
+</div>
+  
 <script>
 (function(){
   var slides=document.querySelectorAll('.slide');
