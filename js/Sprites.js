@@ -1,4 +1,3 @@
-// Renders pixel-art arrays onto canvas contexts
 export function drawPixelMatrix(ctx, matrix, colorMap, startX, startY, pixelSize = 1) {
   for (let r = 0; r < matrix.length; r++) {
     for (let c = 0; c < matrix[r].length; c++) {
@@ -16,14 +15,17 @@ export function drawPixelMatrix(ctx, matrix, colorMap, startX, startY, pixelSize
   }
 }
 
-// Kris Pixel Art Data (19x28 scale)
-export const KRIS_PALETTE = {
-  'H': '#090d16', // Dark Hair
+export const PALETTE = {
+  'H': '#0f172a', // Dark Hair
   'S': '#38bdf8', // Cyan Skin
   'G': '#15803d', // Green Sweater
   'Y': '#facc15', // Yellow Stripe
   'P': '#1e1b4b', // Pants
-  'B': '#020617'  // Shoes
+  'B': '#020617', // Shoes
+  'R': '#ef4444', // Red SOUL
+  'M': '#6366f1', // Monster Blue
+  'W': '#ffffff', // White
+  'D': '#1e293b'  // Monster Dark Shading
 };
 
 export const KRIS_DOWN = [
@@ -32,25 +34,18 @@ export const KRIS_DOWN = [
   "...HHHHHHHHHHH...",
   "..HHHHHHHHHHHHH..",
   "..HHHHHHHHHHHHH..",
-  "..HHHHHHHHHHHHH..",
   "..HHSSSSSSSSH... ",
   "..HHSSSSSSSSH... ",
   "...HSSSSSSSS.....",
   "....SSSSSSSS.....",
   "...GGGGGGGGGGG...",
   "..GGGGGGGGGGGGG..",
-  "..GGGGGGGGGGGGG..",
   "..GGGGYYYYYGGGG..",
-  "..GGGGYYYYYGGGG..",
-  "..GGGGGGGGGGGGG..",
   "..GGGGGGGGGGGGG..",
   "...GGGGGGGGGGG...",
   "....PPPPPPPPP....",
   "....PPPPPPPPP....",
   "....PPPPPPPPP....",
-  "....PPPPPPPPP....",
-  "....PPPPPPPPP....",
-  "....BBBB.BBBB....",
   "....BBBB.BBBB...."
 ];
 
@@ -62,50 +57,87 @@ export const KRIS_UP = [
   "..HHHHHHHHHHHHH..",
   "..HHHHHHHHHHHHH..",
   "..HHHHHHHHHHHHH..",
-  "..HHHHHHHHHHHHH..",
   "...HHHHHHHHHHH...",
   "....HHHHHHHHH....",
   "...GGGGGGGGGGG...",
   "..GGGGGGGGGGGGG..",
-  "..GGGGGGGGGGGGG..",
   "..GGGGYYYYYGGGG..",
-  "..GGGGYYYYYGGGG..",
-  "..GGGGGGGGGGGGG..",
   "..GGGGGGGGGGGGG..",
   "...GGGGGGGGGGG...",
   "....PPPPPPPPP....",
   "....PPPPPPPPP....",
   "....PPPPPPPPP....",
-  "....PPPPPPPPP....",
-  "....PPPPPPPPP....",
-  "....BBBB.BBBB....",
   "....BBBB.BBBB...."
 ];
 
+// Facing Left: Hair Bangs & Face on Left
 export const KRIS_LEFT = [
-  "......HHHHH......",
-  ".....HHHHHHH.....",
+  "......HHHHHH.....",
+  ".....HHHHHHHH....",
   "....HHHHHHHHH....",
   "...HHHHHHHHHH....",
   "...HHHHHHHHHH....",
-  "...HHHHHHHHHH....",
-  "...HHHSSSSS......",
-  "...HHHSSSSS......",
-  "....HHSSSSS......",
-  ".....SSSSSS......",
-  "....GGGGGGGGG....",
-  "...GGGGGGGGGGG...",
-  "...GGGGGGGGGGG...",
-  "...GGGGYYYYGGG...",
-  "...GGGGYYYYGGG...",
-  "...GGGGGGGGGGG...",
-  "...GGGGGGGGGGG...",
-  "....GGGGGGGGG....",
-  ".....PPPPPPP.....",
-  ".....PPPPPPP.....",
-  ".....PPPPPPP.....",
-  ".....PPPPPPP.....",
-  ".....PPPPPPP.....",
-  ".....BBBB.BB.....",
-  ".....BBBB.BB....."
+  "...HSSSSSSHHH....",
+  "...HSSSSSSHHH....",
+  "....SSSSSSHH.....",
+  "....SSSSSS.......",
+  "...GGGGGGGGG.....",
+  "..GGGGGGGGGGG....",
+  "..GGYYYYGGGGG....",
+  "..GGGGGGGGGGG....",
+  "...GGGGGGGGG.....",
+  "....PPPPPPP......",
+  "....PPPPPPP......",
+  "....PPPPPPP......",
+  "....BBBB.BB......"
+];
+
+// Facing Right: Hair Bangs & Face on Right
+export const KRIS_RIGHT = [
+  ".....HHHHHH......",
+  "....HHHHHHHH.....",
+  "....HHHHHHHHH....",
+  "....HHHHHHHHHH...",
+  "....HHHHHHHHHH...",
+  "....HHHSSSSSSH...",
+  "....HHHSSSSSSH...",
+  ".....HHSSSSSS....",
+  ".......SSSSSS....",
+  ".....GGGGGGGGG...",
+  "....GGGGGGGGGGG..",
+  "....GGGGGYYYYGG..",
+  "....GGGGGGGGGGG..",
+  ".....GGGGGGGGG...",
+  "......PPPPPPP....",
+  "......PPPPPPP....",
+  "......PPPPPPP....",
+  "......BB.BBBB...."
+];
+
+export const SOUL_SPRITE = [
+  ".RR..RR.",
+  "RRRRRRRR",
+  "RRRRRRRR",
+  "RRRRRRRR",
+  ".RRRRRR.",
+  "..RRRR..",
+  "...RR..."
+];
+
+export const MONSTER_SPRITE = [
+  ".....WWWWWW.....",
+  "...WWMMMMMMWW...",
+  "..WMMMMMMMMMMW..",
+  ".WMMWMMMMMMWMMW.",
+  ".WMMWMMMMMMWMMW.",
+  "WMMMMMMMMMMMMMMW",
+  "WMMMMWWWWWWMMMMW",
+  "WMMMWDWDWDWDWMMW",
+  ".WMMMDWDWDWDMMW.",
+  "..WMMMMMMMMMMW..",
+  "...WWMMMMMMWW...",
+  "....WMMMMMMW....",
+  "...WMMMMMMMMW...",
+  "..WMMMMMMMMMMW..",
+  "..WMMWWWWWWMMW.."
 ];
