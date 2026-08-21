@@ -13,13 +13,13 @@ export class GameEngine {
     this.map = new RoomMap();
     this.textbox = new Textbox();
 
-    // Transition State
+    // Fade Transition States: 'none', 'out', 'in'
     this.fadeAlpha = 0;
-    this.isTransitioning = false;
+    this.fadeState = 'none';
 
     this.lastTime = 0;
     this.accumulatedTime = 0;
-    this.step = 1 / 60; // Fixed update time step (60fps)
+    this.step = 1 / 60;
   }
 
   start() {
@@ -43,11 +43,39 @@ export class GameEngine {
   }
 
   update(dt) {
-    if (this.isTransitioning) {
-      this.fadeAlpha = Math.min(1, this.fadeAlpha + dt * 1.5);
+    // Handle Room Transition Fading
+    if (this.fadeState === 'out') {
+      this.fadeAlpha += dt * 2.5;
+      if (this.fadeAlpha >= 1) {
+        this.fadeAlpha = 1;
+        
+        // Swap rooms at peak dark
+        if (this.map.currentRoom === 'bedroom') {
+          this.map.loadRoom('hallway');
+          this.player.x = 152;
+          this.player.y = 45;
+          this.player.facing = 'down';
+        } else {
+          this.map.loadRoom('bedroom');
+          this.player.x = 144;
+          this.player.y = 185;
+          this.player.facing = 'up';
+        }
+
+        this.fadeState = 'in';
+      }
       return;
     }
 
+    if (this.fadeState === 'in') {
+      this.fadeAlpha -= dt * 2.5;
+      if (this.fadeAlpha <= 0) {
+        this.fadeAlpha = 0;
+        this.fadeState = 'none';
+      }
+    }
+
+    // Lock player during textboxes
     if (this.textbox.visible) {
       this.textbox.update(this.input);
       return;
@@ -55,7 +83,7 @@ export class GameEngine {
 
     this.player.update(this.input, this.map);
 
-    // Check Dialogue Trigger
+    // Dialogue Triggering
     if (this.input.isPressed('confirm')) {
       const targetPoint = this.player.getInteractionTile();
       const object = this.map.getInteractableAt(targetPoint);
@@ -64,26 +92,33 @@ export class GameEngine {
       }
     }
 
-    // Check Transition Trigger
-    if (this.map.checkDoor(this.player.getBounds())) {
-      this.isTransitioning = true;
+    // Transition Triggering
+    if (this.map.checkDoor(this.player.getBounds()) && this.fadeState === 'none') {
+      this.fadeState = 'out';
     }
   }
 
   render() {
     this.ctx.clearRect(0, 0, this.canvas.width, this.canvas.height);
 
-    // World Render
+    this.ctx.save();
+    // Scale 320x240 coordinate system up to full 640x480 canvas
+    this.ctx.scale(2, 2);
+    this.ctx.imageSmoothingEnabled = false;
+
+    // World & Entities
     this.map.render(this.ctx);
     this.player.render(this.ctx);
 
-    // UI Render
+    // Dialogue UI
     this.textbox.render(this.ctx);
 
-    // Screen Fade Effect
+    // Fade Transition Mask
     if (this.fadeAlpha > 0) {
       this.ctx.fillStyle = `rgba(0, 0, 0, ${this.fadeAlpha})`;
-      this.ctx.fillRect(0, 0, this.canvas.width, this.canvas.height);
+      this.ctx.fillRect(0, 0, 320, 240);
     }
+
+    this.ctx.restore();
   }
 }
