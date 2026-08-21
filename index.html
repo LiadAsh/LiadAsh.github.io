@@ -428,6 +428,7 @@ html,body{height:100%;width:100%;background:var(--bg);color:var(--ink);font-fami
 </head>
 <!--
   Ibaz Fat
+  https://github.com/LiadAsh/LiadAsh.github.io
 -->
 <body>
 
@@ -436,6 +437,8 @@ html,body{height:100%;width:100%;background:var(--bg);color:var(--ink);font-fami
   <span>Baz The FAT</span>
 </div>
 
+<div class="section-tag"><span class="pip"></span><span id="sectionName">Main</span></div>
+  
 <a class="tm-credit" href="https://github.com/LiadAsh" target="_blank" rel="nofollow noopener" aria-label="Created by LiadAsh">
   <span class="tm-dot"></span><span class="tm-label">Created by LiadAsh</span>
 </a>
@@ -443,7 +446,7 @@ html,body{height:100%;width:100%;background:var(--bg);color:var(--ink);font-fami
 <div class="deck" id="deck">
 
   <!-- ============ 1. COVER ============ -->
-  <section class="slide active" data-section="Cover" data-sub="The launch headline">
+  <section class="slide active" data-section="Main" data-sub="The launch headline">
     <div class="slide-inner s-cover">
       <div class="s-cover-inner">
         <div class="s-cover-glow"></div>
@@ -452,7 +455,7 @@ html,body{height:100%;width:100%;background:var(--bg);color:var(--ink);font-fami
           <span class="line"><span><span class="grd">Baz</span> is a fat kid.</span></span>
           <span class="line"><span>And he needs your help.</span></span>
         </h1>
-        <p class="body-lg reveal" style="max-width:680px">In Baz The FAT we are raising a kid named Baz and trying to make his last days better. We want to make Baz enjoy his last days and YOU CAN HELP US!</p>
+        <p class="body-lg reveal" style="max-width:680px">In "Baz The FAT" we are raising a kid named Baz and trying to make his last days better. We want to make Baz enjoy his last days and YOU CAN HELP US!</p>
         <div class="s-cover-meta reveal">
           <span></span><span class="sep"></span>
           <span>Raising Baz</span><span class="sep"></span>
@@ -460,7 +463,7 @@ html,body{height:100%;width:100%;background:var(--bg);color:var(--ink);font-fami
         </div>
         <div class="s-cover-cta reveal">
           <a class="btn-primary">Donate &rarr;</a>
-          <a class="btn-secondary" data-goto="2">Read more about Baz</a>
+          <a id="next" class="btn-secondary">Read more about Baz</a>
         </div>
         <div class="s-cover-version">
           Everything here is fictional, satirical, and terrible humor. It is not intended for the public. I take zero responsibility for any offense taken, and no malice is intended toward anyone. All rights to original assets belong to their respective owners.
@@ -472,7 +475,7 @@ html,body{height:100%;width:100%;background:var(--bg);color:var(--ink);font-fami
   </section>
 
   <!-- ============ 2. PROBLEM ============ -->
-  <section class="slide" data-section="The problem" data-sub="Why teams struggle today">
+  <section class="slide" data-section="More About Baz" data-sub="Why teams struggle today">
     <div class="slide-inner s-problem">
       <div class="s-problem-grid">
         <div class="s-problem-left">
@@ -512,6 +515,20 @@ html,body{height:100%;width:100%;background:var(--bg);color:var(--ink);font-fami
 
 </div>
 
+<!-- POPUP MENU -->
+<div class="menu-overlay" id="menuOverlay"></div>
+<div class="menu-panel" id="menuPanel" role="dialog" aria-label="Slide navigation">
+  <div class="menu-header">
+    <h3>Jump to slide</h3>
+    <div class="menu-meta"><span id="menuCurr">01</span> / <span id="menuTotal">02</span></div>
+  </div>
+  <div class="menu-list" id="menuList"></div>
+  <div class="menu-footer">
+    <span>Tip &middot; press <kbd>M</kbd> to toggle</span>
+    <span><kbd>1</kbd>&ndash;<kbd>9</kbd> direct jump</span>
+  </div>
+</div>
+  
 <!-- NAV: prev | next -->
 <div class="nav">
   <button id="prev" aria-label="Previous slide">&larr;</button>
