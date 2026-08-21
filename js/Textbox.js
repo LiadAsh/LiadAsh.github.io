@@ -6,10 +6,7 @@ export class Textbox {
     this.displayedText = "";
     this.charIndex = 0;
     this.timer = 0;
-    this.speed = 2; // Frames per character
-    this.isFinished = false;
-
-    // Web Audio Synthesizer for Deltarune Text Blip
+    this.speed = 2;
     this.audioCtx = null;
   }
 
@@ -25,16 +22,16 @@ export class Textbox {
     const gain = this.audioCtx.createGain();
     
     osc.type = 'square';
-    osc.frequency.setValueAtTime(320, this.audioCtx.currentTime);
-    osc.frequency.exponentialRampToValueAtTime(120, this.audioCtx.currentTime + 0.04);
+    osc.frequency.setValueAtTime(280, this.audioCtx.currentTime);
+    osc.frequency.exponentialRampToValueAtTime(100, this.audioCtx.currentTime + 0.035);
     
-    gain.gain.setValueAtTime(0.08, this.audioCtx.currentTime);
-    gain.gain.exponentialRampToValueAtTime(0.01, this.audioCtx.currentTime + 0.04);
+    gain.gain.setValueAtTime(0.06, this.audioCtx.currentTime);
+    gain.gain.exponentialRampToValueAtTime(0.001, this.audioCtx.currentTime + 0.035);
     
     osc.connect(gain);
     gain.connect(this.audioCtx.destination);
     osc.start();
-    osc.stop(this.audioCtx.currentTime + 0.04);
+    osc.stop(this.audioCtx.currentTime + 0.035);
   }
 
   start(lines) {
@@ -52,10 +49,8 @@ export class Textbox {
       }
       this.displayedText = "";
       this.charIndex = 0;
-      this.isFinished = false;
     } else {
       this.visible = false;
-      this.isFinished = true;
     }
   }
 
@@ -64,7 +59,6 @@ export class Textbox {
 
     if (input.isPressed('confirm')) {
       if (this.charIndex < this.currentText.length) {
-        // Fast-forward text
         this.displayedText = this.currentText;
         this.charIndex = this.currentText.length;
       } else {
@@ -95,35 +89,31 @@ export class Textbox {
     ctx.fillStyle = '#FFFFFF';
     ctx.fillRect(16, 160, 288, 68);
 
-    // Middle Black Box
+    // Inner Black Box
     ctx.fillStyle = '#000000';
     ctx.fillRect(19, 163, 282, 62);
 
-    // Inner Thin White Line Border
-    ctx.strokeStyle = '#FFFFFF';
-    ctx.lineWidth = 1;
-    ctx.strokeRect(21.5, 165.5, 277, 57);
-
-    // Text Rendering
+    // Crisp Pixel Text Setup
     ctx.fillStyle = '#FFFFFF';
-    ctx.font = '16px "VT323", monospace';
+    ctx.font = '10px "Press Start 2P", monospace';
     ctx.textBaseline = 'top';
 
-    const maxCharsPerLine = 32;
+    // Multi-line Text Formatting
+    const maxLineLength = 25;
     const words = this.displayedText.split(' ');
     let line = '';
-    let y = 173;
+    let y = 174;
 
     for (let i = 0; i < words.length; i++) {
       let testLine = line + words[i] + ' ';
-      if (testLine.length > maxCharsPerLine && i > 0) {
-        ctx.fillText(line, 32, y);
+      if (testLine.length > maxLineLength && i > 0) {
+        ctx.fillText(line.trimEnd(), 30, y);
         line = words[i] + ' ';
-        y += 18;
+        y += 16;
       } else {
         line = testLine;
       }
     }
-    ctx.fillText(line, 32, y);
+    ctx.fillText(line.trimEnd(), 30, y);
   }
 }
