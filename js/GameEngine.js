@@ -13,7 +13,7 @@ export class GameEngine {
     this.map = new RoomMap();
     this.textbox = new Textbox();
 
-    // Fade Transition States: 'none', 'out', 'in'
+    // Transition State Machine: 'none', 'out', 'in'
     this.fadeAlpha = 0;
     this.fadeState = 'none';
 
@@ -43,22 +43,22 @@ export class GameEngine {
   }
 
   update(dt) {
-    // Handle Room Transition Fading
+    // Manage Room Transitions
     if (this.fadeState === 'out') {
-      this.fadeAlpha += dt * 2.5;
+      this.fadeAlpha += dt * 3.0;
       if (this.fadeAlpha >= 1) {
         this.fadeAlpha = 1;
         
-        // Swap rooms at peak dark
+        // Swap room at full opacity
         if (this.map.currentRoom === 'bedroom') {
           this.map.loadRoom('hallway');
-          this.player.x = 152;
-          this.player.y = 45;
+          this.player.x = 142;
+          this.player.y = 42;
           this.player.facing = 'down';
         } else {
           this.map.loadRoom('bedroom');
-          this.player.x = 144;
-          this.player.y = 185;
+          this.player.x = 142;
+          this.player.y = 190;
           this.player.facing = 'up';
         }
 
@@ -68,14 +68,14 @@ export class GameEngine {
     }
 
     if (this.fadeState === 'in') {
-      this.fadeAlpha -= dt * 2.5;
+      this.fadeAlpha -= dt * 3.0;
       if (this.fadeAlpha <= 0) {
         this.fadeAlpha = 0;
         this.fadeState = 'none';
       }
     }
 
-    // Lock player during textboxes
+    // Freeze Kris during Dialogue
     if (this.textbox.visible) {
       this.textbox.update(this.input);
       return;
@@ -83,7 +83,7 @@ export class GameEngine {
 
     this.player.update(this.input, this.map);
 
-    // Dialogue Triggering
+    // Dialogue Triggers
     if (this.input.isPressed('confirm')) {
       const targetPoint = this.player.getInteractionTile();
       const object = this.map.getInteractableAt(targetPoint);
@@ -92,7 +92,7 @@ export class GameEngine {
       }
     }
 
-    // Transition Triggering
+    // Doorway Trigger
     if (this.map.checkDoor(this.player.getBounds()) && this.fadeState === 'none') {
       this.fadeState = 'out';
     }
@@ -101,11 +101,6 @@ export class GameEngine {
   render() {
     this.ctx.clearRect(0, 0, this.canvas.width, this.canvas.height);
 
-    this.ctx.save();
-    // Scale 320x240 coordinate system up to full 640x480 canvas
-    this.ctx.scale(2, 2);
-    this.ctx.imageSmoothingEnabled = false;
-
     // World & Entities
     this.map.render(this.ctx);
     this.player.render(this.ctx);
@@ -113,12 +108,10 @@ export class GameEngine {
     // Dialogue UI
     this.textbox.render(this.ctx);
 
-    // Fade Transition Mask
+    // Screen Fade Overlay
     if (this.fadeAlpha > 0) {
       this.ctx.fillStyle = `rgba(0, 0, 0, ${this.fadeAlpha})`;
       this.ctx.fillRect(0, 0, 320, 240);
     }
-
-    this.ctx.restore();
   }
 }
